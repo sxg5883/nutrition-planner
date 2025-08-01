@@ -1,103 +1,160 @@
-import Image from "next/image";
+'use client';
+import { useState } from 'react';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [calories, setCalories] = useState('');
+  const [protein, setProtein] = useState('');
+  const [restrictions, setRestrictions] = useState('');
+  const [cuisine, setCuisine] = useState('');
+  const [plan, setPlan] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const fetchPlan = async () => {
+    setError('');
+    setPlan('');
+    if (!calories || !protein) {
+      setError('Please provide calories and protein goals.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch('/api/meal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ calories, protein, restrictions, cuisine }),
+      });
+      const json = await res.json();
+      if (json.error) {
+        setError(json.error);
+      } else if (json.mealPlan) {
+        setPlan(json.mealPlan);
+      } else {
+        setError('Unexpected response from server.');
+      }
+    } catch (e) {
+      setError('Failed to fetch plan.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ maxWidth: 900, margin: 'auto', padding: 24, fontFamily: 'system-ui, sans-serif' }}>
+      <h1 style={{ fontSize: 32, color: '#1f6e3f', marginBottom: 12 }}>AI Nutrition Planner</h1>
+
+      <div
+        style={{
+          background: '#f7f9f6',
+          borderRadius: 12,
+          padding: 20,
+          marginBottom: 24,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+        }}
+      >
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 12 }}>
+          <div style={{ flex: '1 1 150px' }}>
+            <label style={{ display: 'block', marginBottom: 4, fontWeight: 600 }}>Calories</label>
+            <input
+              type="number"
+              value={calories}
+              onChange={(e) => setCalories(e.target.value)}
+              placeholder="e.g. 2000"
+              style={{
+                width: '100%',
+                padding: 8,
+                borderRadius: 6,
+                border: '1px solid #c5d0c7',
+              }}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </div>
+
+          <div style={{ flex: '1 1 150px' }}>
+            <label style={{ display: 'block', marginBottom: 4, fontWeight: 600 }}>Protein (g)</label>
+            <input
+              type="number"
+              value={protein}
+              onChange={(e) => setProtein(e.target.value)}
+              placeholder="e.g. 150"
+              style={{
+                width: '100%',
+                padding: 8,
+                borderRadius: 6,
+                border: '1px solid #c5d0c7',
+              }}
+            />
+          </div>
+
+          <div style={{ flex: '1 1 200px' }}>
+            <label style={{ display: 'block', marginBottom: 4, fontWeight: 600 }}>Dietary Restrictions</label>
+            <input
+              type="text"
+              value={restrictions}
+              onChange={(e) => setRestrictions(e.target.value)}
+              placeholder="e.g. no dairy, vegetarian"
+              style={{
+                width: '100%',
+                padding: 8,
+                borderRadius: 6,
+                border: '1px solid #c5d0c7',
+              }}
+            />
+          </div>
+
+          <div style={{ flex: '1 1 150px' }}>
+            <label style={{ display: 'block', marginBottom: 4, fontWeight: 600 }}>Cuisine</label>
+            <input
+              type="text"
+              value={cuisine}
+              onChange={(e) => setCuisine(e.target.value)}
+              placeholder="e.g. Mediterranean"
+              style={{
+                width: '100%',
+                padding: 8,
+                borderRadius: 6,
+                border: '1px solid #c5d0c7',
+              }}
+            />
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+        <button
+          onClick={fetchPlan}
+          disabled={loading}
+          style={{
+            background: '#276749',
+            color: '#fff',
+            padding: '12px 24px',
+            border: 'none',
+            borderRadius: 8,
+            cursor: loading ? 'not-allowed' : 'pointer',
+            fontWeight: 600,
+          }}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          {loading ? 'Generating...' : 'Generate Meal Plan'}
+        </button>
+
+        {error && (
+          <div style={{ color: '#c0392b', marginTop: 12, fontWeight: 500 }}>{error}</div>
+        )}
+      </div>
+
+      {plan && (
+        <div
+          style={{
+            background: '#ffffff',
+            border: '1px solid #d6e4d1',
+            borderRadius: 10,
+            padding: 18,
+            whiteSpace: 'pre-wrap',
+            lineHeight: 1.35,
+            fontSize: 14,
+          }}
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          {plan}
+        </div>
+      )}
     </div>
   );
 }
+
