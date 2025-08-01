@@ -64,7 +64,8 @@ export default function Home() {
                 width: '100%',
                 padding: 8,
                 borderRadius: 6,
-                border: '1px solid #c5d0c7',
+                border: '1px solid #c5d0c7'
+                color: '#000',
               }}
             />
           </div>
@@ -80,7 +81,8 @@ export default function Home() {
                 width: '100%',
                 padding: 8,
                 borderRadius: 6,
-                border: '1px solid #c5d0c7',
+                border: '1px solid #c5d0c7'
+                color: '#000',
               }}
             />
           </div>
@@ -96,7 +98,8 @@ export default function Home() {
                 width: '100%',
                 padding: 8,
                 borderRadius: 6,
-                border: '1px solid #c5d0c7',
+                border: '1px solid #c5d0c7'
+                color: '#000',
               }}
             />
           </div>
@@ -112,7 +115,8 @@ export default function Home() {
                 width: '100%',
                 padding: 8,
                 borderRadius: 6,
-                border: '1px solid #c5d0c7',
+                border: '1px solid #c5d0c7'
+                color: '#000',
               }}
             />
           </div>
